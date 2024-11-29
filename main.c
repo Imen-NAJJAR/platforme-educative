@@ -1,40 +1,43 @@
 #include <stdio.h>
 #include <stdlib.h>
-void hashPassword(const char *password, char *hashedPassword) {
-    unsigned int hash = 0;
-    while (*password) {
-        hash = (hash * 31) + *password++;
-    }
-    sprintf(hashedPassword, "%u", hash);
-}
-void ajouter_etd()
+#include<string.h>
+typedef struct
 {
-    FILE *file;
-    if((file=fopen("fiche_etd.txt","a"))==NULL){
-        printf("impossible d'ouvrir le fichier ");
+    int jour,mois,annee;
+}date;
+void ajouter_test(const char *file)
+{
+    FILE *f;
+    if((f=fopen(file,"w")==NULL)){
+       printf("impossible d'ouvrir le fichier");
+       return;
     }
-    char id[20], NomPre[50], gr[50], password[50], hashedPassword[50];
-    printf("entrer le ID de l'etudiant:\n");
-    scanf("%s",&id);
-    printf("entrer le nom et le prenom de l'etudiant:\n");
-    getchar();
-    fgets(NomPre,sizeof(NomPre),stdin);
-    NomPre[strcspn(NomPre, "\n")] = '\0';
-    printf("le groupe de l'etudiant:\n");
-    scanf("%s",&gr);
-    printf("Entrez le mot de passe : ");
-    scanf("%s", password);
-    hashPassword(password,hashedPassword);
-    fprintf(file,"ID:  %s\n",id);
-    fprintf(file,"Nom et prenom: %s\n",NomPre);
-    fprintf(file,"Groupe: %s\n",gr);
-    fprintf(file,"Mot de passe (haché): %s\n",hashedPassword);
-    fprintf(file, "--------------------------------------\n");
-    fclose(file);
-    printf("etudiant ajouté avec succès !\n");
+    int id;
+    printf("saisir l'identifiant du test: ");
+    scanf("%d",&id);
+    fprintf(f,"DI: %d\n",id);
+    date D;
+    printf("saisir la date limite pour rende le test: ");
+    scanf("%d %d %d",&D.jour,&D.mois,&D.annee);
+    fprintf(f,"Date limite: %d/%d/%d\n",D.jour,D.mois,D.annee);
+    while (getchar() != '\n');
+    char ch[256];
+    printf("saisir le contenu du test: ");
+    fgets(ch,sizeof(ch),stdin);
+    size_t len = strlen(ch);
+    if (len > 0 && ch[len - 1] == '\n') {
+        ch[len - 1] = '\0';
+    }
+    fprintf(f,"Contenu: %s\n",ch);
+    fclose(f);
+    printf("test ajouté avec sucsée.");
+
 }
+
 int main()
 {
-ajouter_etd();
+    ajouter_test("ajout");
     return 0;
 }
+//il ne s'affiche rien meme si le fichier existe
+//le programme executable mais les information ne se stocke pas
