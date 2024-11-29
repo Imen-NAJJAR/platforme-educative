@@ -1,69 +1,43 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-void hashPassword(const char *password, char *hashedPassword) {
-    unsigned int hash = 0;
-    while (*password) {
-        hash = (hash * 31) + *password++;
+#include<string.h>
+typedef struct
+{
+    int jour,mois,annee;
+}date;
+void ajouter_test(const char *file)
+{
+    FILE *f;
+    if((f=fopen(file,"w")==NULL)){
+       printf("impossible d'ouvrir le fichier");
+       return;
     }
-    sprintf(hashedPassword, "%u", hash);
+    int id;
+    printf("saisir l'identifiant du test: ");
+    scanf("%d",&id);
+    fprintf(f,"DI: %d\n",id);
+    date D;
+    printf("saisir la date limite pour rende le test: ");
+    scanf("%d %d %d",&D.jour,&D.mois,&D.annee);
+    fprintf(f,"Date limite: %d/%d/%d\n",D.jour,D.mois,D.annee);
+    while (getchar() != '\n');
+    char ch[256];
+    printf("saisir le contenu du test: ");
+    fgets(ch,sizeof(ch),stdin);
+    size_t len = strlen(ch);
+    if (len > 0 && ch[len - 1] == '\n') {
+        ch[len - 1] = '\0';
+    }
+    fprintf(f,"Contenu: %s\n",ch);
+    fclose(f);
+    printf("test ajouté avec sucsée.");
+
 }
 
-// Fonction d'authentification des professeurs
-int authentifier() {
-    FILE *file;
-    char id[20], password[50], hashedPassword[50];
-    char line[200], storedId[20], storedHashedPassword[50];
-    int found = 0;
-
-    // Demander l'ID et le mot de passe du professeur
-    printf("Entrez votre ID : ");
-    scanf("%s", id);
-    printf("Entrez votre mot de passe : ");
-    scanf("%s", password);
-
-    // Hacher le mot de passe fourni par l'utilisateur
-    hashPassword(password, hashedPassword);
-
-    // Ouvrir le fichier authentification.txt
-    file = fopen("ajouter_etd.txt", "r");
-    if (file == NULL) {
-        printf("Erreur : Impossible d'ouvrir le fichier .\n");
-        return 0; // Échec
-    }
-
-    // Rechercher l'ID et vérifier le mot de passe
-    while (fgets(line, sizeof(line), file) != NULL) {
-        if (sscanf(line, "ID: %s\n", storedId) == 1) {
-            if (strcmp(storedId, id) == 0) {
-                // L'ID est trouvé, rechercher le mot de passe
-                while (fgets(line, sizeof(line), file) != NULL) {
-                    if (sscanf(line, "Mot de passe (haché): %s\n", storedHashedPassword) == 1) {
-                        if (strcmp(storedHashedPassword, hashedPassword) == 0) {
-                            found = 1; // Authentification réussie
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    fclose(file);
-
-    if (found) {
-        printf("Authentification réussie. Bienvenue !\n");
-        return 1; // Succès
-    } else {
-        printf("Authentification échouée. ID ou mot de passe incorrect.\n");
-        return 0; // Échec
-    }
-}
-int main() {
-    if (authentifier()) {
-        printf("Vous êtes connecté au système.\n");
-    } else {
-        printf("Veuillez réessayer.\n");
-    }
+int main()
+{
+    ajouter_test("ajout");
     return 0;
 }
+//il ne s'affiche rien meme si le fichier existe
+//le programme executable mais les information ne se stocke pas
