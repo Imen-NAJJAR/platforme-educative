@@ -1,56 +1,40 @@
-//executable
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-void afficher_cour_td(const char *fichier) {
-    int ID;
-    printf("Saisir l'identifiant du CourTD à afficher :\n");
-    scanf("%d", &ID);
-
-    FILE *f = fopen(fichier, "r");
-    if (f == NULL) {
-        printf("Impossible d'ouvrir le fichier.\n");
-        return;
+void hashPassword(const char *password, char *hashedPassword) {
+    unsigned int hash = 0;
+    while (*password) {
+        hash = (hash * 31) + *password++;
     }
-
-    bool test = false;
-    int id;
-    char ch[256];
-    char titre[256] = "";
-    char contenu[256] = "";
-    bool trouve = false;
-
-    while (fgets(ch, sizeof(ch), f)) {
-        if (strncmp(ch, "ID:", 3) == 0) {
-            // Lire l'ID et vérifier la correspondance
-            sscanf(ch, "ID: %d", &id);
-            test = (id == ID);
-            if (test) {
-                trouve = true; // ID trouvé, marquer comme trouvé
-                strcpy(titre, "");  // Réinitialiser pour éviter les résidus
-                strcpy(contenu, "");
-            }
-        } else if ((test) && strncmp(ch, "Titre:", 6) == 0) {
-            // Lire le titre
-            sscanf(ch, "Titre: %s", titre);
-        } else if ((test) && strncmp(ch, "Contenu:", 8) == 0) {
-            // Lire le contenu
-            sscanf(ch, "Contenu: %s", contenu);
-        }
-    }
-
-    fclose(f); // Toujours fermer le fichier après utilisation
-
-    if (trouve) {
-        printf("Titre : %s\n", titre);
-        printf("Contenu : %s\n", contenu);
-    } else {
-        printf("Aucun CourTD trouvé avec l'ID %d.\n", ID);
-    }
+    sprintf(hashedPassword, "%u", hash);
 }
-
-int main() {
-    afficher_cour_td("ficher.txt");
+void ajouter_etd()
+{
+    FILE *file;
+    if((file=fopen("fiche_etd.txt","a"))==NULL){
+        printf("impossible d'ouvrir le fichier ");
+    }
+    char id[20], NomPre[50], gr[50], password[50], hashedPassword[50];
+    printf("entrer le ID de l'etudiant:\n");
+    scanf("%s",&id);
+    printf("entrer le nom et le prenom de l'etudiant:\n");
+    getchar();
+    fgets(NomPre,sizeof(NomPre),stdin);
+    NomPre[strcspn(NomPre, "\n")] = '\0';
+    printf("le groupe de l'etudiant:\n");
+    scanf("%s",&gr);
+    printf("Entrez le mot de passe : ");
+    scanf("%s", password);
+    hashPassword(password,hashedPassword);
+    fprintf(file,"ID:  %s\n",id);
+    fprintf(file,"Nom et prenom: %s\n",NomPre);
+    fprintf(file,"Groupe: %s\n",gr);
+    fprintf(file,"Mot de passe (haché): %s\n",hashedPassword);
+    fprintf(file, "--------------------------------------\n");
+    fclose(file);
+    printf("etudiant ajouté avec succès !\n");
+}
+int main()
+{
+ajouter_etd();
     return 0;
 }
